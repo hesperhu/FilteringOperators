@@ -3,6 +3,27 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+
+//过滤掉队列中相邻的重复数据 2023-03-08(Wed) 10:20:01
+example(of: "RemoveDuplicates") {
+    let words = "我 知道 知道 知道 你 不 知道"
+        .components(separatedBy: " ")
+        .publisher
+    
+    words
+        .removeDuplicates()
+        .collect()
+        .sink { value in
+            print(value)
+        }
+        .store(in: &subscriptions)
+}
+/*
+ ——— Example of: RemoveDuplicates ———
+ ["我", "知道", "你", "不", "知道"]
+ */
+
+
 //可以对数据队列进行过滤，只发送需要的数据 2023-03-08(Wed) 10:05:05
 example(of: "filter") {
     let numbers = (1...12).publisher

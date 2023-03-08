@@ -3,7 +3,25 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-
+//可以对数据队列进行过滤，只发送需要的数据 2023-03-08(Wed) 10:05:05
+example(of: "filter") {
+    let numbers = (1...12).publisher
+    numbers
+        .filter { value in
+            value.isMultiple(of: 4)
+        }
+        .sink { value in
+            print(value, " is a mutiple of 4")
+        }
+        .store(in: &subscriptions)
+}
+/*
+ 
+ ——— Example of: filter ———
+ 4  is a mutiple of 4
+ 8  is a mutiple of 4
+ 12  is a mutiple of 4
+ */
 
 /// Copyright (c) 2021 Razeware LLC
 ///

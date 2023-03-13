@@ -3,6 +3,109 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+
+
+//使用first，last查找队列中的一个消息,注意last需要接收到全部队列的数据 2023-03-13(Mon) 10:08:37
+example(of: "first(where:)") {
+    let numbersPublisher = (1...6).publisher
+    numbersPublisher //查询到之后，停止
+        .print("First filter Numbers")
+        .first { value in
+            value % 2 == 0
+        }
+        .sink { value in
+            print("First filter Completed with: \(value)")
+        } receiveValue: { value in
+            print("First filter Received value: \(value)")
+        }
+        .store(in: &subscriptions)
+    
+    numbersPublisher //发送全部信息，再查询
+        .print("Last filter Numbers")
+        .last { value in
+            value % 2 == 0
+        }
+        .sink { value in
+            print("Last filter Completed with: \(value)")
+        } receiveValue: { value in
+            print("Last filter Received value: \(value)")
+        }
+        .store(in: &subscriptions)
+    
+    let manualNumberSender = PassthroughSubject<Int, Never>()
+    
+    manualNumberSender //发送全部信息，再查询
+        .print("Manual last filter Numbers")
+        .last { value in
+            value % 2 == 0
+        }
+        .sink { value in
+            print("Manual last filter Completed with: \(value)")
+        } receiveValue: { value in
+            print("Manual last filter Received value: \(value)")
+        }
+        .store(in: &subscriptions)
+    
+    manualNumberSender //查询到之后，停止
+        .print("Manual first filter Numbers")
+        .first { value in
+            value % 2 == 0
+        }
+        .sink { value in
+            print("Manual first filter Completed with: \(value)")
+        } receiveValue: { value in
+            print("Manual first filter Received value: \(value)")
+        }
+        .store(in: &subscriptions)
+    
+    manualNumberSender.send(1)
+    manualNumberSender.send(2)
+    manualNumberSender.send(3)
+    manualNumberSender.send(4)
+    manualNumberSender.send(5)
+    
+    manualNumberSender.send(completion: .finished)
+}
+/*
+ ——— Example of: first(where:) ———
+ First filter Numbers: receive subscription: (1...6)
+ First filter Numbers: request unlimited
+ First filter Numbers: receive value: (1)
+ First filter Numbers: receive value: (2)
+ First filter Numbers: receive cancel
+ First filter Received value: 2
+ First filter Completed with: finished
+ Last filter Numbers: receive subscription: (1...6)
+ Last filter Numbers: request unlimited
+ Last filter Numbers: receive value: (1)
+ Last filter Numbers: receive value: (2)
+ Last filter Numbers: receive value: (3)
+ Last filter Numbers: receive value: (4)
+ Last filter Numbers: receive value: (5)
+ Last filter Numbers: receive value: (6)
+ Last filter Numbers: receive finished
+ Last filter Received value: 6
+ Last filter Completed with: finished
+ Manual last filter Numbers: receive subscription: (PassthroughSubject)
+ Manual last filter Numbers: request unlimited
+ Manual first filter Numbers: receive subscription: (PassthroughSubject)
+ Manual first filter Numbers: request unlimited
+ Manual last filter Numbers: receive value: (1)
+ Manual first filter Numbers: receive value: (1)
+ Manual last filter Numbers: receive value: (2)
+ Manual first filter Numbers: receive value: (2)
+ Manual first filter Numbers: receive cancel
+ Manual first filter Received value: 2
+ Manual first filter Completed with: finished
+ Manual last filter Numbers: receive value: (3)
+ Manual last filter Numbers: receive value: (4)
+ Manual last filter Numbers: receive value: (5)
+ Manual last filter Numbers: receive finished
+ Manual last filter Received value: 4
+ Manual last filter Completed with: finished
+ */
+
+
 //只关注消息结束的时候，使用ignoreOutput，仅处理completion 2023-03-13(Mon) 09:47:17
 example(of: "ignoreOutput") {
     let numbersPublisher = (1...10000).publisher

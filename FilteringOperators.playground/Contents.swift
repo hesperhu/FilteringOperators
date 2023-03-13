@@ -4,6 +4,38 @@ import Combine
 var subscriptions = Set<AnyCancellable>()
 
 
+//对消息队列中的optional结果进行统一的unwrap处理 2023-03-13(Mon) 09:38:59
+example(of: "compactMap") {
+    let stringsPublisher = ["a", "12.3", "899"].publisher
+    stringsPublisher
+        .compactMap { value in
+            Float(value)
+        }
+        .sink { value in
+            print("compactMap filtering result: ", value)
+        }
+        .store(in: &subscriptions)
+    
+    stringsPublisher
+        .map { value in
+            Float(value)
+        }
+        .filter { value in
+            value == nil ? false : true
+        }
+        .sink { value in
+            print("filter and unwrap filtering result: ", value ?? "Non")
+        }
+        .store(in: &subscriptions)
+}
+/*
+ ——— Example of: compactMap ———
+ compactMap filtering result:  12.3
+ compactMap filtering result:  899.0
+ filter and unwrap filtering result:  12.3
+ filter and unwrap filtering result:  899.0
+ */
+
 //过滤掉队列中相邻的重复数据 2023-03-08(Wed) 10:20:01
 example(of: "RemoveDuplicates") {
     let words = "我 知道 知道 知道 你 不 知道"

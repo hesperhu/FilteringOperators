@@ -3,6 +3,25 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+//只关注消息结束的时候，使用ignoreOutput，仅处理completion 2023-03-13(Mon) 09:47:17
+example(of: "ignoreOutput") {
+    let numbersPublisher = (1...10000).publisher
+    
+    numbersPublisher
+        .ignoreOutput()
+        .sink { value in
+            print("Completed with \(value)")
+        } receiveValue: { value in
+            print("Received value: \(value)")
+        }
+        .store(in: &subscriptions)
+
+}
+/*
+ ——— Example of: ignoreOutput ———
+ Completed with finished
+ */
+
 
 //对消息队列中的optional结果进行统一的unwrap处理 2023-03-13(Mon) 09:38:59
 example(of: "compactMap") {

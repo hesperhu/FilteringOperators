@@ -3,7 +3,51 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+//drop(while:)用来按条件从头丢弃连续的信息，条件不满足后，就不再丢弃 2023-03-14(Tue) 09:22:11
+example(of: "drop(while:)") {
+    let numbers = (4...12).publisher
+    numbers
+        .drop(while: { value in
+            print("x", " drop logic is working on \(value)")
+            return value.isMultiple(of: 4)
+        })
+        .sink { value in
+            print(value, " is rest of number after drop")
+        }
+        .store(in: &subscriptions)
+}
+/*
+  ——— Example of: drop(while:) ———
+ x  drop logic is working on 4
+ x  drop logic is working on 5
+ 5  is rest of number after drop
+ 6  is rest of number after drop
+ 7  is rest of number after drop
+ 8  is rest of number after drop
+ 9  is rest of number after drop
+ 10  is rest of number after drop
+ 11  is rest of number after drop
+ 12  is rest of number after drop
+ */
 
+
+//dropFirst可以简单丢弃前几个消息 2023-03-14(Tue) 09:07:46
+example(of: "dropFirst") {
+    let numbersPublisher = (0...9).publisher
+    numbersPublisher
+        .dropFirst(7)
+        .sink { value in
+            print("Rest of number: \(value)")
+        }
+        .store(in: &subscriptions)
+}
+/*
+ ——— Example of: dropFirst ———
+ Rest of number: 7
+ Rest of number: 8
+ Rest of number: 9
+
+ */
 
 //使用first，last查找队列中的一个消息,注意last需要接收到全部队列的数据 2023-03-13(Mon) 10:08:37
 example(of: "first(where:)") {

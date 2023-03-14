@@ -3,6 +3,32 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+//drop(unitilOutputFrom:)用其他publisher的输出当做中止丢弃的条件 2023-03-14(Tue) 09:36:19
+example(of: "drop(untilOutputFrom:)") {
+    let isReady = PassthroughSubject<Void, Never>()
+    let taps = PassthroughSubject<Int, Never>()
+    
+    taps
+        .drop(untilOutputFrom: isReady)
+        .sink { value in
+            print("\(value) is rest of value after tapping")
+        }
+        .store(in: &subscriptions)
+    
+    (1...5).forEach { i in
+        taps.send(i)
+        if i == 2 {
+            isReady.send()
+        }
+    }
+}
+/*
+ ——— Example of: drop(untilOutputFrom:) ———
+ 3 is rest of value after tapping
+ 4 is rest of value after tapping
+ 5 is rest of value after tapping
+ */
+
 //drop(while:)用来按条件从头丢弃连续的信息，条件不满足后，就不再丢弃 2023-03-14(Tue) 09:22:11
 example(of: "drop(while:)") {
     let numbers = (4...12).publisher

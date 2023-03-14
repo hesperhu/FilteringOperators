@@ -3,6 +3,71 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+//prefix(unitlOutputFrom:)用另外一个publisher的输出来控制获取前几个消息，之后再也不发送消息 2023-03-14(Tue) 09:53:34
+example(of: "prefix(untilOutputFrom:)") {
+    let isReady = PassthroughSubject<Void, Never>()
+    let taps = PassthroughSubject<Int, Never>()
+    
+    taps
+        .prefix(untilOutputFrom: isReady)
+        .sink(receiveCompletion: { value in
+            print("Complete with: \(value)")
+        }, receiveValue: { value in
+            print("\(value) is leading number")
+        })
+        .store(in: &subscriptions)
+    
+    (1...5).forEach { i in
+        taps.send(i)
+        if i == 2 {
+            isReady.send()
+        }
+    }
+}
+/*
+ ——— Example of: prefix(untilOutputFrom:) ———
+ 1 is leading number
+ 2 is leading number
+ Complete with: finished
+ */
+
+//prefix(while:)用来获取前几个消息,后面再也不发送消息 2023-03-14(Tue) 09:47:32
+example(of: "prefix(while:)") {
+    let numbers = (4...12).publisher
+    numbers
+        .prefix(while: { value in
+            print("x", " prefix logic is working on \(value)")
+            return value.isMultiple(of: 4)
+        })
+        .sink { value in
+            print(value, " is the leading number")
+        }
+        .store(in: &subscriptions)
+}
+/*
+ ——— Example of: prefix(while:) ———
+ x  prefix logic is working on 4
+ x  prefix logic is working on 5
+ 4  is the leading number
+ */
+
+//prefix用来获取前几个消息 2023-03-14(Tue) 09:44:39
+example(of: "prefix") {
+    let numbersPublisher = (0...9).publisher
+    numbersPublisher
+        .prefix(2)
+        .sink { value in
+            print("Leading number: \(value)")
+        }
+        .store(in: &subscriptions)
+}
+/*
+ ——— Example of: prefix ———
+ First of number: 0
+ First of number: 1
+ */
+
+
 //drop(unitilOutputFrom:)用其他publisher的输出当做中止丢弃的条件 2023-03-14(Tue) 09:36:19
 example(of: "drop(untilOutputFrom:)") {
     let isReady = PassthroughSubject<Void, Never>()

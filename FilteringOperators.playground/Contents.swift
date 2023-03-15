@@ -140,8 +140,8 @@ example(of: "dropFirst") {
 
  */
 
-//使用first，last查找队列中的一个消息,注意last需要接收到全部队列的数据 2023-03-13(Mon) 10:08:37
-example(of: "first(where:)") {
+//使用first，last查找队列中的一个消息,注意last需要接收到全部队列的数据 2023-03-13(Mon) 10:08:37 2023-03-16(Thu) 05:43:08
+example(of: "first/last(where:)") {
     let numbersPublisher = (1...6).publisher
     numbersPublisher //查询到之后，停止
         .print("First filter Numbers")
